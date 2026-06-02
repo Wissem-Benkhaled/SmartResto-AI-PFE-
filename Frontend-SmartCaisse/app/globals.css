@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+:root {
+  --button-bg: #00c950;
+  --button-bg-hover: #01a442;
+  --button-bg-disabled: #9ca3af;
+  --button-fg: #ffffff;
+  --button-border: #50db62;
+  --button-radius: 0.5rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.4);
+  border-radius: 20px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.7);
+}
+
+/* Firefox */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100,116,139,0.4) transparent;
+}
+
+.global-btn,
+.MuiButton-root.global-btn {
+  background-color: var(--button-bg);
+  color: var(--button-fg);
+  border-color: var(--button-border);
+}
+
+.global-btn:hover,
+.MuiButton-root.global-btn:hover {
+  background-color: var(--button-bg-hover);
+  color: var(--button-fg);
+  border-color: var(--button-border);
+}
+
+.global-btn-disabled,
+.MuiButton-root.global-btn-disabled {
+  background-color: var(--button-bg-disabled);
+  color: var(--button-fg);
+  cursor: not-allowed;
+}
+
+button:not(.MuiIconButton-root):not([class*="bg-"]):not([class*="text-"]):not([class*="border-"]),
+.MuiButton-root:not(.MuiIconButton-root) {
+  border-radius: var(--button-radius);
+  border: 1px solid var(--button-border);
+  background-color: var(--button-bg) !important;
+  color: var(--button-fg) !important;
+  /* font: inherit; */
+  /* font-weight: 500; */
+  /* min-height: 1.5rem; */
+  /* padding: 0.5rem 1rem; */
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  text-decoration: none;
+  outline: none;
+}
+
+button:not(.MuiIconButton-root):not([class*="bg-"]):not([class*="text-"]):not([class*="border-"]):hover:not(:disabled),
+.MuiButton-root:not(.MuiIconButton-root):hover:not(:disabled) {
+  background-color: var(--button-bg-hover) !important;
+  color: var(--button-fg) !important;
+}
+
+button:not(.MuiIconButton-root):focus-visible,
+.MuiButton-root:not(.MuiIconButton-root):focus-visible {
+  box-shadow: 0 0 0 3px rgba(219, 80, 80, 0.28);
+}
+
+button:not(.MuiIconButton-root):disabled,
+.MuiButton-root:not(.MuiIconButton-root).Mui-disabled {
+  background-color: var(--button-bg-disabled) !important;
+  color: var(--button-fg) !important;
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.global-text {
+  color: #00a63e;
+  font-weight: bold;
+}
+
+.globals-colors {
+  background-color: #00c950;
+}
+
+.global-border-success {
+  border-color: #50db83;
+  outline: none;
+}
+
+.global-left-border {
+  border-radius: 10px;
+  border-left: 6px solid #00c950c8;
+}
+
+.global-border-supplements {
+  border-bottom: 2px solid #00c950;
+  outline: none;
+  margin: 2.5px;
+  margin-left: 0;
+}
+
+/* .global-btn {
+  background-color: #00c950;
+  color: #ffffff;
+}
+
+.global-btn:hover {
+  background-color: #00a63e;
+}
+
+.global-btn-disabled {
+  background-color: #9ca3af;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+.MuiButton-root.global-btn {
+  background-color: #00c950;
+}
+
+.MuiButton-root.global-btn:hover {
+  background-color: #00a63e;
+}
+
+.MuiButton-root.global-btn-disabled {
+  background-color: #9ca3af;
+  color: #ffffff;
+}
+
+.global-text {
+  color: #00a63e;
+  font-weight: bold;
+
+}
+
+.globals-colors {
+  background-color: #00a63e;
+}
+.global-border-success {
+  border-color: #50db83;
+} */

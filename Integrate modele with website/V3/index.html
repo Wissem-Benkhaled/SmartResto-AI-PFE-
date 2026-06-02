@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Health & Safety Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/style.css?v=3">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="top-nav">
+            <div class="logo">
+                <span class="shield-icon">🛡️</span>
+                <h1>Health & Safety Monitor</h1>
+            </div>
+            <div class="nav-tabs">
+                <button id="tab-health" class="tab-btn active">Detect regle santé</button>
+                <button id="tab-movement" class="tab-btn">Mouvment</button>
+                <button id="tab-attendance" class="tab-btn">Pointage</button>
+            </div>
+            <div class="connection-status">
+                <div class="indicator" id="ws-indicator"></div>
+                <span id="ws-text">Connecting...</span>
+            </div>
+        </header>
+
+        <!-- HEALTH & SAFETY VIEW -->
+        <main id="view-health" class="dashboard view-section active">
+            <div class="video-section">
+                <div class="video-wrapper">
+                    <video id="webcam-health" autoplay playsinline muted></video>
+                    <canvas id="overlay-health"></canvas>
+                    <div id="video-overlay-ui-health" class="overlay-ui">Waiting for camera...</div>
+                </div>
+                <div class="controls">
+                    <button id="camera-btn-health" class="btn primary">Start Camera</button>
+                    <button id="toggle-stream-btn-health" class="btn secondary" disabled>Start Inference</button>
+                </div>
+            </div>
+
+            <div class="status-section">
+                <div class="status-card highlight">
+                    <h3>Overall Compliance</h3>
+                    <div id="overall-status" class="status-badge unknown">UNKNOWN</div>
+                    <p id="overall-message" class="status-msg">Waiting for detection...</p>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="icon">😷</div>
+                        <h4>Face Mask</h4>
+                        <div id="mask-status" class="value waiting">Scanning...</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="icon">🧤</div>
+                        <h4>Safety Gloves</h4>
+                        <div id="gloves-status" class="value waiting">Scanning...</div>
+                    </div>
+                </div>
+
+                <div class="log-card">
+                    <h3>Recent Detections</h3>
+                    <ul id="event-log-health" class="event-log">
+                        <li>System initialized. Waiting for stream...</li>
+                    </ul>
+                </div>
+
+                <div class="registration-card">
+                    <h3>Register New Worker</h3>
+                    <p class="status-msg">Type a name and press capture to register a new face.</p>
+                    <div class="reg-form">
+                        <input type="text" id="worker-name-input" placeholder="Worker Name" autocomplete="off" />
+                        <button id="register-btn" class="btn primary">Capture & Save Face</button>
+                    </div>
+                    <div id="reg-status-msg" class="reg-status-msg"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- MOVEMENT DETECTION VIEW -->
+        <main id="view-movement" class="dashboard view-section hidden">
+            <div class="video-section">
+                <div class="video-wrapper">
+                    <video id="webcam-movement" autoplay playsinline muted></video>
+                    <canvas id="overlay-movement"></canvas>
+                    <div id="video-overlay-ui-movement" class="overlay-ui">Waiting for camera...</div>
+                </div>
+                <div class="controls">
+                    <button id="camera-btn-movement" class="btn primary">Start Camera</button>
+                    <button id="toggle-stream-btn-movement" class="btn secondary" disabled>Start 24/7
+                        Monitoring</button>
+                </div>
+            </div>
+
+            <div class="status-section">
+                <div class="status-card highlight movement-status-card">
+                    <h3>Movement Monitoring</h3>
+                    <div id="movement-status-badge" class="status-badge safe">MONITORING</div>
+                    <p id="movement-status-msg" class="status-msg">System active. Analyzing feed...</p>
+                </div>
+
+                <div class="log-card movement-log-card">
+                    <h3>Movement Activity Logs</h3>
+                    <ul id="event-log-movement" class="event-log">
+                        <li>System ready for 24/7 movement detection.</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <!-- ATTENDANCE (POINTAGE) VIEW -->
+        <main id="view-attendance" class="dashboard view-section hidden">
+            <div class="video-section">
+                <div class="video-wrapper">
+                    <video id="webcam-attendance" autoplay playsinline muted></video>
+                    <canvas id="overlay-attendance"></canvas>
+                    <div id="video-overlay-ui-attendance" class="overlay-ui">Waiting for camera...</div>
+                </div>
+                <div class="controls">
+                    <button id="camera-btn-attendance" class="btn primary">Start Camera</button>
+                    <div class="attendance-actions" style="display: flex; gap: 0.5rem; flex-grow: 1; justify-content: flex-end;">
+                        <button id="btn-check-in" class="btn attendance-in" disabled style="background-color: var(--success); color: white;">Check In (Arrivée)</button>
+                        <button id="btn-check-out" class="btn attendance-out" disabled style="background-color: var(--danger); color: white;">Check Out (Départ)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-section">
+                <div class="status-card highlight attendance-status-card">
+                    <h3>Attendance Status</h3>
+                    <div id="attendance-status-badge" class="status-badge unknown">READY</div>
+                    <p id="attendance-status-msg" class="status-msg">Press a button to mark your attendance.</p>
+                </div>
+
+                <div class="log-card attendance-log-card">
+                    <h3>Recent Attendance Logs</h3>
+                    <ul id="event-log-attendance" class="event-log">
+                        <li>System ready for check-in/out.</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/assets/script.js?v=3"></script>
+</body>
+
+</html>

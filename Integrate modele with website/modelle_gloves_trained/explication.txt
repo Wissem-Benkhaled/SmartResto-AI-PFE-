@@ -1,0 +1,138 @@
+🔹 1. Import des librairies
+import cv2
+import torch
+import torch.nn as nn
+from torchvision import transforms, models
+import numpy as np
+from PIL import Image
+import mediapipe as mp
+
+👉 Ces bibliothèques servent à :
+
+        cv2 → gérer la webcam (OpenCV)
+        torch → utiliser le modèle IA (deep learning)
+        torchvision → modèles + transformations d’images
+        PIL → manipuler les images
+        mediapipe → détecter les mains
+
+
+
+
+🔹 2. Setup du modèle PyTorch
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+👉 Choisir automatiquement le meilleur moteur pour faire tourner ton modèle IA
+        GPU ⚡ → rapide (recommandé)
+        CPU 🐢 → lent mais fonctionne.
+
+
+
+📌 definition de Modèle MobileNetV2
+{
+        =>MobileNetV2 est un modèle de deep learning utilisé pour :
+             - reconnaître des images 📸
+        🔹 1. Objectif du fichier
+        Ce document explique le fonctionnement du dossier `modelle_gloves_trained` : pipeline de détection/diagnostic de gants à partir d'une webcam, composants utilisés (Mediapipe pour la détection des mains, PyTorch pour la classification), et conseils d'utilisation.
+
+
+        🔹 2. Aperçu des fichiers dans `modelle_gloves_trained`
+
+        - `best_gloves_detector.pth`
+                - Rôle : checkpoint PyTorch contenant les poids (généralement un `state_dict`) pour le modèle de détection/classification des gants.
+                - Utilisation : charger avec `torch.load('best_gloves_detector.pth', map_location=device)` puis `model.load_state_dict(...)` ou recharger l'objet complet si le modèle a été sauvé entier.
+                - Référence : PyTorch — Sauvegarde et chargement : https://pytorch.org/tutorials/beginner/saving_loading_models.html
+
+        - `hand_landmarker.task`
+                - Rôle : fichier de tâche/modèle pour Mediapipe (Hand Landmarker). Contient la définition et les poids nécessaires à la détection des mains et l'extraction des landmarks.
+                - Utilisation : chargé via l'API MediaPipe Tasks (ex. code JS/Python) pour obtenir des landmarks et détections de main. Permet d'obtenir des boxes précises autour des mains.
+                - Référence : MediaPipe Hand Landmarker (Tasks API) : https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
+
+        - `test_webcam_gloves.py`
+                - Rôle : script de test temps réel qui capture la webcam, détecte/recadre les mains (Mediapipe), applique les transformations, puis prédit `Gloves` / `No Gloves` via le modèle PyTorch et affiche les résultats.
+                - Exécution : `python test_webcam_gloves.py` (pré-requis : `opencv-python`, `torch`, `torchvision`, `mediapipe`, `pillow`).
+                - Référence : OpenCV webcam capture : https://docs.opencv.org/4.x/dd/d43/tutorial_py_video_display.html ; inference PyTorch : https://pytorch.org/tutorials/beginner/saving_loading_models.html
+
+
+        🔹 3. Concepts et étapes clés (détaillé)
+
+        - Imports et bibliothèques
+                - `cv2` (OpenCV) : capture vidéo, affichage, dessin (rectangles + texte).
+                - `torch`, `torch.nn` : modèle, chargement de poids, évaluation.
+                - `torchvision.transforms` : transformations d'image (resize, normalisation).
+                - `PIL.Image` : conversion entre arrays et objets image pour `torchvision`.
+                - `mediapipe` : détection et landmarks de la main.
+                - Références : OpenCV (https://opencv.org/), torchvision transforms (https://pytorch.org/vision/stable/transforms.html), MediaPipe (https://developers.google.com/mediapipe)
+
+        - Device
+                - `device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")` : utiliser GPU si disponible.
+                - Référence : https://pytorch.org/docs/stable/tensor_attributes.html
+
+        - Architecture modèle
+                - Exemple courant : `models.mobilenet_v2(pretrained=False)` puis remplacer la tête par `nn.Linear(...)` pour `num_classes=2`.
+                - Pourquoi MobileNetV2 : léger, adapté temps réel.
+                - Référence : MobileNetV2 (TorchVision) : https://pytorch.org/vision/stable/models.html
+
+        - Chargement des poids
+                - `checkpoint = torch.load(path, map_location=device)` puis :
+                        - si `checkpoint` est un dict contenant `model_state_dict` : `model.load_state_dict(checkpoint['model_state_dict'])`
+                        - sinon : `model.load_state_dict(checkpoint)` avec `strict=False` si noms/clés diffèrent.
+                - Référence : https://pytorch.org/tutorials/beginner/saving_loading_models.html
+
+        - Transformations (doivent correspondre à l'entraînement)
+                - Exemple :
+                        transforms.Compose([
+                                        transforms.Resize((224,224)),
+                                        transforms.ToTensor(),
+                                        transforms.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])
+                        ])
+                - IMPORTANT : conserver la même normalisation que l'entraînement.
+                - Référence : torchvision transforms (https://pytorch.org/vision/stable/transforms.html)
+
+        - Détection & crop de la main
+                - Obtenir landmarks via `hand_landmarker.task`, calculer bounding box minimal puis ajouter du `padding` (~10-30 px) pour éviter de tronquer.
+                - Convertir en RGB puis PIL pour appliquer `transform`.
+
+        - Inference
+                - `model.eval()` + `with torch.no_grad(): outputs = model(input_tensor)` puis `probs = torch.softmax(outputs[0], dim=0)` et `confidence, pred = torch.max(probs, 0)`.
+                - Afficher rectangle + texte (`cv2.rectangle`, `cv2.putText`).
+                - Référence softmax / torch.no_grad : https://pytorch.org/docs/stable/generated/torch.no_grad.html
+
+
+        🔹 4. Conseils / dépannage rapide
+
+        - Si `model.load_state_dict` échoue :
+                - Vérifier si le checkpoint est `state_dict` ou un dict complet (avec métriques, optimizer, etc.).
+                - Utiliser `strict=False` pour charger partiellement et inspecter les clés manquantes.
+                - Comparer `list(model.state_dict().keys())` et les clés du checkpoint pour détecter préfixes (`module.` vs pas `module.`) ou mismatch de shapes.
+
+        - Si la prédiction est mauvaise :
+                - Vérifier que les transformations (taille, normalisation) sont identiques à l'entraînement.
+                - Vérifier la qualité du crop (ne pas inclure trop d'arrière-plan ni tronquer la main).
+
+
+        🔹 5. Commandes utiles
+
+        Installation minimale (venv recommandé) :
+        ```bash
+        python -m pip install -r requirements.txt
+        # ou
+        pip install torch torchvision opencv-python mediapipe pillow
+        ```
+
+        Lancer le script webcam :
+        ```bash
+        python test_webcam_gloves.py
+        ```
+
+
+        🔹 6. Références principales
+
+        - PyTorch — Sauvegarde et chargement : https://pytorch.org/tutorials/beginner/saving_loading_models.html
+        - Torchvision models/transforms : https://pytorch.org/vision/stable/
+        - OpenCV (capture & affichage) : https://docs.opencv.org/4.x/
+        - MediaPipe Hand Landmarker (Tasks API) : https://developers.google.com/mediapipe/solutions/vision/hand_landmarker
+
+
+        ---
+        Fichier mis à jour : `modelle_gloves_trained/explication.txt`
+        Ajout : descriptions des fichiers, références et conseils manquants.
