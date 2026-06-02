@@ -1,0 +1,17 @@
+node_modules/
+__pycache__/
+.env
+dist/
+.next/
+Paiment/
+
+# Modèles et archives lourdes (> 100 Mo)
+model.zip
+Integrate modele with website/scratch/
+*.whl
+*.zip
+*.tar.gz
+
+# Logs locaux générés
+Integrate modele with website/V3/logs/*.csv
+Integrate modele with website/V3/movement_logs/*.jpg
