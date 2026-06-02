@@ -38,7 +38,7 @@ cd "SmartResto-AI-PFE-Project/Frontend-Admin"
 yarn dev
 ```
 
-Exécution (intégration du modèle avec le site web) :
+Exécution (intégration du modèle avec le site web, **Windows uniquement**) :
 ```bat
-SmartResto-AI-PFE-Project\Integrate modele with website\run_v3.bat
+"SmartResto-AI-PFE-Project\Integrate modele with website\run_v3.bat"
 ```
